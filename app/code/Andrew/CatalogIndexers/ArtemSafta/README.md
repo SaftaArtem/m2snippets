@@ -72,6 +72,16 @@ price.... Загрузка цены для продукта заняла бы м
 - `indexer_state`
 - `mview_state`
 
+#Indexer Table Switching
+
+М2 оптимизирует определенные индексационные процессы для того, чтобы предотвратить взаимоблокировки и блокировки ожидания
+В этих случаях magento использует отдельные для выполнения операций чтения и реиндекса. Как результат процесс переключения таблиц
+не влияет на пользователей во время полного реиндекса. К примеру когда `catalog_product_price` индексируется, На клиентах это не отразится. 
+
+Magento использует такие таблицы при процессе переключения.
+
+![Alt text](./table_switch.png?raw=true "Priority")
+
 Рассмотрим создание кастомного индекса:
 
 создаём `etc/indexer.xml`
@@ -111,24 +121,29 @@ use Magento\Framework\Indexer\ActionInterface;
 
 class CustomIndex implements ActionInterface, \Magento\Framework\Mview\ActionInterface
 {
+    // срабатывает при полном реиндексе
+    // будет срабатывать при запуски соответствующей команда из консоли
     public function executeFull()
     {
         // do something
     }
-
+    
+    // срабатывает при массэкшн 
     public function executeList(array $ids)
     {
         // do something
     }
 
+    // срабатывает для одного продукта
     public function executeRow($id)
     {
         // do something
     }
 
+    // Используется mview, позволяет процессить индексер в режиме "Update on schedule"
     public function execute($ids)
     {
-        // do something
+        //do something
     }
 }
 ```
